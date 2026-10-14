@@ -1,0 +1,40 @@
+/bin/
+/dist/
+/defi
+.mintlify/
+*.test
+*.out
+.coverprofile
+.DS_Store
+TODO.md
+
+# Python (agent/)
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+
+# Java agent service
+defi-agent-service/target/
+.idea/
+resume/
+未命名/
+.env
+.env.*
+*.pem
+*.key
+
+# Local development artifacts
+**/target/
+*.log
+*.mv.db
+*.trace.db
+dump.rdb
+appendonlydir/
+.m2/
+node_modules/
+.vscode/
+!.env.example
+!.env.sample
