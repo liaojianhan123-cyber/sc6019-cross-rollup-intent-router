@@ -6,6 +6,11 @@ execution state machine.
 
 ## Features
 
+- **English browser interface**: wallet controls, examples, action cards, errors,
+  rule-based chat replies and model instructions use English. Try `Deposit 1000
+  USDC into a yield pool on Ethereum`, `Confirm` (paper simulation), and `Status`.
+  Choose **Review in wallet** for wallet signing. English browser history uses a
+  separate storage namespace, so existing Chinese history is retained separately.
 - **Unified REST API** for DeFi asset/lending/yield/swap/bridge queries (`/api/v1/*`), all backed
   by real data fetched through the Go `defi-cli` binary (no private keys required for reads).
 - **AI agent orchestration** (`/api/chat`): Spring AI + OpenAI tool-calling translates natural
@@ -106,7 +111,7 @@ mvn spring-boot:run
 - `GET /api/v1/yield/opportunities?chain=ethereum&asset=USDC`
 - `GET /api/v1/swap/quote?provider=uniswap&chain=ethereum&fromAsset=USDC&toAsset=ETH&amount=1000000&fromAddress=0x...`
 - `GET /api/v1/bridge/quote?provider=across&from=ethereum&to=base&asset=USDC&amount=1000000`
-- `POST /api/chat` `{"sessionId": "s1", "message": "把 1000 USDC 存到以太坊收益最高的池"}`
+- `POST /api/chat` `{"sessionId": "s1", "message": "Deposit 1000 USDC into a yield pool on Ethereum"}`
 - `GET /api/actions/{actionId}/estimate` — real gas/fee estimate for a plan's `defiActionId`
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
 

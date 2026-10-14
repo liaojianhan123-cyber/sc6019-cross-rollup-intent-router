@@ -74,6 +74,7 @@ README.md                         # user-facing usage + caveats
 
 ## Non-obvious but important
 
+- The Java agent service (`defi-agent-service/`) has an English browser UI and English fallback replies. Keep the model's wallet instructions aligned with the **Review in wallet** button. Chat **confirm** is paper execution; wallet signing remains user-controlled. UI history uses the `:en` storage namespace.
 - Error output always returns a full envelope, even with `--results-only` or `--select`.
 - Config precedence is `flags > env > config file > defaults`.
 - `yield --providers` expects provider names (`aave,morpho,kamino,moonwell,compoundv3,pendle`), not protocol categories.

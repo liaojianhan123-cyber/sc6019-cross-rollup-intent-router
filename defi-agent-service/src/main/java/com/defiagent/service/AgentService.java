@@ -74,7 +74,7 @@ public class AgentService {
     private ChatResponse plan(String session, Intent intent) {
         List<YieldOpportunity> top = yieldService.topOpportunities(intent.asset(), intent.chain(), 3);
         if (top.isEmpty()) {
-            return ChatResponse.text("没有找到 " + intent.asset() + " 在 " + intent.chain() + " 上的收益机会。");
+            return ChatResponse.text("No yield opportunities found for " + intent.asset() + " on " + intent.chain() + ".");
         }
         YieldOpportunity best = top.get(0);
 
@@ -91,12 +91,12 @@ public class AgentService {
         action.setStatus(ActionStatus.PLANNED);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("为你比较了 ").append(top.size()).append(" 个协议，推荐 ")
-                .append(best.provider()).append("（").append(best.chain()).append("）：\n");
+        sb.append("Compared ").append(top.size()).append(" protocols. Suggested option: ")
+                .append(best.provider()).append(" (").append(best.chain()).append("):\n");
         for (YieldOpportunity o : top) {
             sb.append(String.format("  - %-10s APY %.2f%%  TVL $%,.0f%n", o.provider(), o.apy(), o.tvlUsd()));
         }
-        sb.append(String.format("计划：存入 %s %s 到 %s。%n", intent.amount(), best.asset(), best.provider()));
+        sb.append(String.format("Plan: deposit %s %s into %s.%n", intent.amount(), best.asset(), best.provider()));
 
         // Best-effort: if the user gave a wallet address, also create a REAL defi-cli
         // plan (real action_id + on-chain call steps) so /api/actions/{id}/estimate has
@@ -106,7 +106,7 @@ public class AgentService {
         }
 
         repository.save(action);
-        sb.append("真上链请在页面点「用钱包执行」（MetaMask 弹窗，私钥不出钱包）。回复 “确认” 仍是 paper 模拟广播。");
+        sb.append("For on-chain execution, choose Review in wallet and sign in MetaMask. Reply confirm to run a paper simulation.");
 
         return new ChatResponse(sb.toString(), action.getActionId(), ActionStatus.PLANNED.name(), top);
     }
@@ -124,9 +124,9 @@ public class AgentService {
             if (planned != null && planned.actionId() != null) {
                 action.setDefiActionId(planned.actionId());
                 action.setStepsSummary(summarizeSteps(planned));
-                sb.append("已通过 defi-cli 生成真实 action_id=").append(planned.actionId())
-                        .append("（仍未广播，可用 GET /api/actions/").append(action.getActionId())
-                        .append("/estimate 查看真实 gas 预估）。\n");
+                sb.append("Created a CLI transaction plan with action_id=").append(planned.actionId())
+                        .append(" (not broadcast; use GET /api/actions/").append(action.getActionId())
+                        .append("/estimate to request a gas estimate).\n");
             }
         } catch (DefiCliException e) {
             log.info("real defi-cli plan not created (code={} type={}): {}", e.getCode(), e.getType(), e.getMessage());
@@ -154,7 +154,7 @@ public class AgentService {
                 .findFirstBySessionIdAndStatusOrderByCreatedAtDesc(session, ActionStatus.PLANNED)
                 .orElse(null);
         if (pending == null) {
-            return ChatResponse.text("没有待确认的操作。请先告诉我你想做什么，例如：把 1000 USDC 存到以太坊收益最高的池。");
+            return ChatResponse.text("No action is awaiting confirmation. Generate a plan first, for example: Deposit 1000 USDC into a yield pool on Ethereum.");
         }
         try {
             pending.transitionTo(ActionStatus.QUEUED);
@@ -162,13 +162,13 @@ public class AgentService {
             // Racing confirm (e.g. double-click) or the action already moved on; don't
             // publish a second execution command for the same actionId.
             log.warn("confirm rejected: {}", e.getMessage());
-            return ChatResponse.text("这个操作已经在处理中或已完成，无需重复确认。回复 “状态” 查询结果。");
+            return ChatResponse.text("This action is already processing or complete. Reply status to check the result.");
         }
         pending = repository.save(pending);
         executionProducer.publish(pending.getActionId());
 
         return new ChatResponse(
-                "已提交 paper 模拟执行（不会弹出 MetaMask、不会动真实资金）。真上链请点页面上的「用钱包执行」。",
+                "Queued for paper execution. This does not open MetaMask or move real funds. Choose Review in wallet for on-chain execution.",
                 pending.getActionId(),
                 ActionStatus.QUEUED.name(),
                 null);
@@ -177,25 +177,25 @@ public class AgentService {
     private ChatResponse status(String session) {
         List<AgentAction> recent = repository.findTop20BySessionIdOrderByCreatedAtDesc(session);
         if (recent.isEmpty()) {
-            return ChatResponse.text("这个会话还没有任何操作。");
+            return ChatResponse.text("There are no actions in this conversation yet.");
         }
         AgentAction latest = recent.get(0);
         String reply = switch (latest.getStatus()) {
-            case CONFIRMED -> "✅ 执行完成，txHash=" + latest.getTxHash();
-            case EXECUTING, QUEUED -> "⏳ 正在执行中，请稍候再查。";
-            case PLANNED -> "📝 计划已生成，尚未确认。回复 “确认” 执行。";
-            case FAILED -> "❌ 执行失败。";
-            case CANCELLED -> "已取消。";
+            case CONFIRMED -> "✅ Action recorded as confirmed. txHash=" + latest.getTxHash();
+            case EXECUTING, QUEUED -> "⏳ Execution is in progress. Check again shortly.";
+            case PLANNED -> "📝 Plan created, awaiting confirmation. Reply confirm to run a paper simulation.";
+            case FAILED -> "❌ Execution failed.";
+            case CANCELLED -> "Cancelled.";
         };
         return new ChatResponse(reply, latest.getActionId(), latest.getStatus().name(), latest);
     }
 
     private String helpText() {
         return """
-                我是 DeFi AI Agent。你可以对我说：
-                  - 把 1000 USDC 存到以太坊收益最高的池   （生成计划）
-                  - 确认                                    （执行，paper 模式）
-                  - 状态                                    （查询结果）
+                I am your DeFi AI Agent. Try:
+                  - Deposit 1000 USDC into a yield pool on Ethereum (create a plan)
+                  - Confirm (paper execution)
+                  - Status (check the result)
                 """;
     }
 }

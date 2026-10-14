@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -439,34 +439,34 @@
         <div class="brand-mark">⚡</div>
         <div>
           <div class="brand-title">DeFi AI Agent</div>
-          <div class="brand-sub">自然语言 → 计划 → 钱包确认</div>
+          <div class="brand-sub">Natural language → Plan → Wallet review</div>
         </div>
       </div>
       <div class="header-right">
-        <button class="wallet-btn" id="walletBtn" type="button">连接 MetaMask</button>
-        <div class="mode-pill"><span class="dot"></span>Tool-Calling Online</div>
+        <button class="wallet-btn" id="walletBtn" type="button">Connect MetaMask</button>
+        <div class="mode-pill"><span class="dot"></span>Agent workspace</div>
       </div>
     </header>
 
     <div class="chips" id="chips">
-      <div class="chip" data-msg="查一下 aave 在以太坊上 USDC 的收益率">📊 查 Aave USDC 收益率</div>
-      <div class="chip" data-msg="什么是无常损失">💡 什么是无常损失</div>
-      <div class="chip" data-msg="帮我把 1000 USDC 存到以太坊上收益最高的池子">🏦 存 1000 USDC 到最高收益池</div>
-      <div class="chip" data-wallet="1">🦊 用钱包确认执行</div>
-      <div class="chip" data-msg="状态">🔍 查询状态</div>
+      <div class="chip" data-msg="Show Aave USDC yield opportunities on Ethereum">📊 Explore USDC yields</div>
+      <div class="chip" data-msg="What is impermanent loss?">💡 What is impermanent loss?</div>
+      <div class="chip" data-msg="Deposit 1000 USDC into the highest-yield pool on Ethereum">🏦 Plan a 1000 USDC deposit</div>
+      <div class="chip" data-wallet="1">🦊 Review in wallet</div>
+      <div class="chip" data-msg="Status">🔍 Check status</div>
     </div>
 
     <div class="chat" id="chat"></div>
 
     <div class="composer">
       <div class="input-bar">
-        <input id="input" type="text" placeholder="用自然语言描述你想做的事，例如：把 1000 USDC 存到收益最高的池子…" autocomplete="off" />
-        <button class="send-btn" id="sendBtn" title="发送">
+        <input id="input" type="text" placeholder="Describe your goal, e.g. deposit 1000 USDC into a yield pool…" autocomplete="off" />
+        <button class="send-btn" id="sendBtn" title="Send" aria-label="Send message">
           <svg viewBox="0 0 24 24" fill="none"><path d="M4 12L20 4L13 20L11 13L4 12Z" fill="currentColor"/></svg>
         </button>
       </div>
       <div class="footnote">
-        真上链：连接钱包后点「用钱包确认执行」，MetaMask 弹窗由你签字。聊天里回复「确认」仍是 paper 模拟。 · <span class="reset-link" id="resetBtn">开始新会话</span>
+        For on-chain execution, connect your wallet and choose "Review in wallet". You sign in MetaMask. Chat "confirm" runs a paper simulation. · <span class="reset-link" id="resetBtn">New conversation</span>
       </div>
     </div>
   </div>
@@ -476,8 +476,8 @@
 (function () {
   const API_CHAT = '/api/chat';
   const API_ACTION = '/api/actions/';
-  const SESSION_KEY = 'defi-agent-session-id';
-  const HISTORY_KEY_PREFIX = 'defi-agent-history:';
+  const SESSION_KEY = 'defi-agent-session-id:en';
+  const HISTORY_KEY_PREFIX = 'defi-agent-history:en:';
 
   const chatEl = document.getElementById('chat');
   const inputEl = document.getElementById('input');
@@ -543,9 +543,9 @@
           ${badgeHtml(status)}
         </div>
         <div class="action-buttons">
-          <button class="mini-btn copy-btn">复制 ID</button>
-          <button class="mini-btn detail-btn">查看详情</button>
-          <button class="mini-btn wallet wallet-exec-btn">用钱包执行</button>
+          <button class="mini-btn copy-btn">Copy ID</button>
+          <button class="mini-btn detail-btn">View details</button>
+          <button class="mini-btn wallet wallet-exec-btn">Review in wallet</button>
         </div>
         <div class="detail-json"></div>
       </div>
@@ -587,7 +587,7 @@
   }
 
   function setWalletLabel() {
-    walletBtn.textContent = connectedAccount ? shortAddr(connectedAccount) : '连接 MetaMask';
+    walletBtn.textContent = connectedAccount ? shortAddr(connectedAccount) : 'Connect MetaMask';
   }
 
   function ethereumProvider() {
@@ -597,7 +597,7 @@
   async function connectWallet() {
     const eth = ethereumProvider();
     if (!eth) {
-      throw new Error('未检测到 MetaMask。请用 Chrome/Brave 安装扩展后打开本页（http://localhost:8080）。');
+      throw new Error('MetaMask was not detected. Install the extension in a supported browser, then open this page.');
     }
     const accounts = await eth.request({ method: 'eth_requestAccounts' });
     connectedAccount = accounts && accounts[0] ? accounts[0] : null;
@@ -643,16 +643,16 @@
     const planRes = await fetch(API_ACTION + encodeURIComponent(actionId) + '/wallet-plan');
     const plan = await planRes.json();
     if (!planRes.ok) {
-      throw new Error(plan.message || plan.error || ('无法加载计划 HTTP ' + planRes.status));
+      throw new Error(plan.message || plan.error || ('Could not load the plan. HTTP ' + planRes.status));
     }
     const txs = plan.transactions || [];
-    if (!txs.length) throw new Error('计划里没有可发送的链上调用');
+    if (!txs.length) throw new Error('This plan contains no transactions to send.');
 
     const plannedFrom = (plan.fromAddress || '').toLowerCase();
     if (plannedFrom && plannedFrom !== account.toLowerCase()) {
       const ok = window.confirm(
-        '计划里的 from 地址是 ' + plan.fromAddress + '，当前钱包是 ' + account +
-        '。\n地址不一致时交易可能失败或打到错误账户。仍要用当前钱包发送吗？'
+        'The plan uses sender ' + plan.fromAddress + ', but the connected wallet is ' + account +
+        '.\nA sender mismatch may cause the transaction to fail or affect the wrong account. Continue with this wallet?'
       );
       if (!ok) return;
     }
@@ -680,7 +680,7 @@
       body: JSON.stringify({ fromAddress: account, txHashes: hashes })
     });
 
-    agentNote('钱包已广播 ' + hashes.length + ' 笔交易。最后一笔 txHash=`' + hashes[hashes.length - 1] + '`。后端没有私钥，只记录了你签过的哈希。');
+    agentNote('Your wallet broadcast ' + hashes.length + ' transaction(s). Last txHash=`' + hashes[hashes.length - 1] + '`. The backend holds no private key and records the submitted hashes; receipt confirmation is not verified here.');
   }
 
   async function executeWalletForLatest() {
@@ -688,18 +688,18 @@
       const res = await fetch('/api/actions?sessionId=' + encodeURIComponent(sessionId));
       const body = await res.json();
       if (!res.ok || !Array.isArray(body)) {
-        const msg = (body && (body.message || body.error)) ? (body.message || body.error) : ('无法列出计划 HTTP ' + res.status);
+        const msg = (body && (body.message || body.error)) ? (body.message || body.error) : ('Could not list plans. HTTP ' + res.status);
         throw new Error(msg);
       }
       const pending = body.find(a => a.status === 'PLANNED' && a.defiActionId)
         || body.find(a => a.status === 'PLANNED');
       if (!pending) {
-        agentNote('当前会话没有 PLANNED 状态的计划。请先让 Agent 生成存款计划（需要你的钱包地址），再点用钱包执行。', true);
+        agentNote('There is no PLANNED action in this conversation. Generate a deposit plan with your wallet address, then choose Review in wallet.', true);
         return;
       }
       await executeWallet(pending.actionId);
     } catch (e) {
-      const msg = (e && e.code === 4001) ? '你在 MetaMask 里取消了签名。' : (e.message || String(e));
+      const msg = (e && e.code === 4001) ? 'You cancelled the request in MetaMask.' : (e.message || String(e));
       agentNote(msg, true);
     }
   }
@@ -715,25 +715,25 @@
 
     copyBtn.addEventListener('click', () => {
       navigator.clipboard.writeText(actionId).then(() => {
-        copyBtn.textContent = '已复制 ✓';
-        setTimeout(() => copyBtn.textContent = '复制 ID', 1400);
+        copyBtn.textContent = 'Copied ✓';
+        setTimeout(() => copyBtn.textContent = 'Copy ID', 1400);
       });
     });
 
     detailBtn.addEventListener('click', async () => {
       const showing = detailBox.style.display === 'block';
-      if (showing) { detailBox.style.display = 'none'; detailBtn.textContent = '查看详情'; return; }
-      detailBtn.textContent = '加载中…';
+      if (showing) { detailBox.style.display = 'none'; detailBtn.textContent = 'View details'; return; }
+      detailBtn.textContent = 'Loading…';
       try {
         const res = await fetch(API_ACTION + encodeURIComponent(actionId));
         const data = await res.json();
         detailBox.textContent = JSON.stringify(data, null, 2);
         detailBox.style.display = 'block';
-        detailBtn.textContent = '收起详情';
+        detailBtn.textContent = 'Hide details';
       } catch (e) {
-        detailBox.textContent = '加载失败：' + e.message;
+        detailBox.textContent = 'Could not load details: ' + e.message;
         detailBox.style.display = 'block';
-        detailBtn.textContent = '收起详情';
+        detailBtn.textContent = 'Hide details';
       }
     });
 
@@ -743,7 +743,7 @@
         try {
           await executeWallet(actionId);
         } catch (e) {
-          const msg = (e && e.code === 4001) ? '你在 MetaMask 里取消了签名。' : (e.message || String(e));
+          const msg = (e && e.code === 4001) ? 'You cancelled the request in MetaMask.' : (e.message || String(e));
           agentNote(msg, true);
         } finally {
           walletExecBtn.disabled = false;
@@ -755,7 +755,7 @@
   function renderFromHistory() {
     chatEl.innerHTML = '';
     if (history.length === 0) {
-      appendRow('agent', { text: '你好，我是 DeFi AI Agent 👋\n\n先点右上角连接 MetaMask，再用自然语言生成计划。真上链请点「用钱包执行」——弹窗里的交易是计划里已经算好的 calldata，由你在钱包里做最后确认。聊天里回复「确认」仍是 paper 模拟，不会弹出钱包。' });
+      appendRow('agent', { text: 'Hi, I am your DeFi AI Agent 👋\n\nDescribe a goal to generate a plan. Include your wallet address if you want a CLI transaction plan. For on-chain execution, connect MetaMask and choose **Review in wallet** to review and sign the prepared transactions. Chat **confirm** runs a paper simulation without opening your wallet.' });
       return;
     }
     history.forEach(item => {
@@ -847,7 +847,7 @@
       }
 
       const payload = {
-        text: full || '(空响应)',
+        text: full || '(Empty response)',
         actionId: doneMeta.actionId,
         status: doneMeta.status
       };
@@ -857,7 +857,7 @@
       saveHistory(history);
     } catch (e) {
       typingRow.remove();
-      appendRow('agent', { text: '请求失败：' + (e.message || e), error: true });
+      appendRow('agent', { text: 'Request failed: ' + (e.message || e), error: true });
     } finally {
       sendBtn.disabled = false;
       inputEl.focus();
@@ -874,7 +874,7 @@
       });
       let payload;
       if (!res.ok) {
-        let msg = `请求失败（HTTP ${res.status}）`;
+        let msg = `Request failed (HTTP ${res.status})`;
         try {
           const err = await res.json();
           msg = err.message || err.error || msg;
@@ -882,7 +882,7 @@
         payload = { text: msg, error: true };
       } else {
         const data = await res.json();
-        payload = { text: data.reply || '(空响应)', actionId: data.actionId, status: data.status };
+        payload = { text: data.reply || '(Empty response)', actionId: data.actionId, status: data.status };
       }
       typingRow.remove();
       const row = appendRow('agent', payload);
@@ -891,7 +891,7 @@
       saveHistory(history);
     } catch (e) {
       typingRow.remove();
-      appendRow('agent', { text: '网络错误：无法连接到 defi-agent-service（' + e.message + '）', error: true });
+      appendRow('agent', { text: 'Network error: could not connect to defi-agent-service (' + e.message + ')', error: true });
     }
   }
 
@@ -918,7 +918,7 @@
     });
   }
   resetBtn.addEventListener('click', () => {
-    if (!confirm('开始新会话会清空当前对话历史（服务端 ChatMemory 也会用新的 sessionId），确定吗？')) return;
+    if (!confirm('Start a new conversation? The current view will be cleared and a new session will be used.')) return;
     sessionId = uuid();
     localStorage.setItem(SESSION_KEY, sessionId);
     history = [];

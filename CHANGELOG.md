@@ -37,6 +37,7 @@ Format:
 - `StepExecutor` interface for chain-specific execution; EVM path extracted unchanged, Tempo path added.
 
 ### Changed
+- Switched the Java agent browser UI, fallback chat replies and model-facing UI instructions to English.
 - `swap quote --type exact-output` now supports `--provider tempo` in addition to `uniswap`.
 - `swap plan` now supports Tempo execution planning, and `tempo-dex` / `tempodex` aliases normalize to the canonical `tempo` provider.
 - `actions estimate` now returns fee-token-denominated estimates for Tempo actions with `fee_unit` and `fee_token` fields, instead of rejecting them.
