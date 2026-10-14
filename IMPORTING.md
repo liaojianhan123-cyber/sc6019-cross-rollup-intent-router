@@ -1,16 +1,19 @@
-# 新仓库使用说明
+# SC6019 第六个 Topic：仓库使用说明
 
-这是完整项目：Go CLI、Python agent、Java agent 服务、浏览器界面、测试和文档都已保留。
+本仓库用于 SC6019 Option 6（跨 Rollup 意图路由器）。
+已有 capstone 的 Go CLI、Python agent、Java 服务、浏览器界面、测试和文档作为基础保留。
+课程选题与新增范围见 [SC6019_TOPIC6.md](SC6019_TOPIC6.md)。
+路由器、路由比较界面与实验尚待实现。
 来源见 [ORIGINAL_SOURCE.md](ORIGINAL_SOURCE.md)。新 Git 历史以一次导入提交开始。
 
 ## 提交到自己的 GitHub 仓库
 
-1. 在目标 GitHub 账号中新建一个空仓库，例如 `defi-agent`。仓库公开或私有由你选择。
+1. 在目标 GitHub 账号中新建一个空仓库，例如 `sc6019-cross-rollup-intent-router`。仓库公开或私有由你选择。
 2. 创建时不要自动添加 README、LICENSE 或 `.gitignore`，本地项目已有文件和提交。
 3. 在本目录运行下面的命令，把示例地址换成你实际创建的仓库地址：
 
 ```bash
-git remote add origin https://github.com/liaojianhan123-cyber/defi-agent.git
+git remote add origin https://github.com/liaojianhan123-cyber/sc6019-cross-rollup-intent-router.git
 git push -u origin main
 ```
 
@@ -67,4 +70,5 @@ python agent/defi_agent.py --help
   开发这份独立副本时，请先按上面的方式从本地源代码构建。
 - 原 GitHub Actions 工作流已保留；新仓库的 CI、发布及文档站需要在新仓库中验证。
 
-建议先提交每一项明确的功能或修复，再逐步增加记忆管理、任务恢复和测试。
+课程开发优先实现意图格式、双环境路由、路由解释和基准实验。
+长期记忆、向量检索和新增钱包集成可以作为后续扩展。

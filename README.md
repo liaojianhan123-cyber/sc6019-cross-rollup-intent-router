@@ -1,16 +1,31 @@
-# defi-cli
+# SC6019: Cross-Rollup Intent Router
 
-## Independent DeFi Agent repository
+**Option 6 — Cross-Rollup Intent Router for Scalable User Transactions**
 
-This repository contains the complete Go CLI, Python agent and Java Spring Boot
-agent service. It starts a new Git history from an explicitly attributed import;
-see [source provenance](ORIGINAL_SOURCE.md).
+This course project proposes an intent router that compares at least two execution
+environments using cost and latency, selects a feasible route and explains the
+selection to the user. It builds on an existing capstone DeFi CLI and agent service.
 
-Start with the [Chinese setup and push guide](IMPORTING.md), the
-[Java agent service](defi-agent-service/README.md), or the
-[Python agent sources](agent/). Build the CLI from this local source tree when
-working on this independent copy. The installation and documentation links below
-are retained from the original project and may point to upstream resources.
+**Current status:** the imported Go CLI, Python agent, Java service and browser UI
+are available. The SC6019 intent router, route-comparison UI and benchmark study
+are planned additions; they are not implemented by this repository setup.
+
+- [Course proposal, requirement mapping and MVP plan](SC6019_TOPIC6.md)
+- [Chinese setup and GitHub push guide](IMPORTING.md)
+- [Original source and contribution provenance](ORIGINAL_SOURCE.md)
+- [Existing Java agent service](defi-agent-service/README.md)
+
+The course-specific contribution will be the routing layer, an explainable frontend
+and a reproducible comparison against fixed-route baselines. The MVP will use two
+explicitly simulated rollup environments, as permitted by the supplied SC6019
+project description (Option 6, pages 11–12). Live integrations are an optional
+extension.
+
+## Existing CLI documentation
+
+The documentation below describes the inherited CLI. Upstream installation and
+documentation links are preserved; build this independent copy from local source
+using the setup guide above.
 
 <p align="center">
   <img src="assets/logo.png" alt="defi-cli logo" width="600" />

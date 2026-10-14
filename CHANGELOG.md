@@ -46,6 +46,7 @@ Format:
 - Optimism USDC bootstrap address now points to native USDC (`0x0b2c...ff85`) instead of bridged USDC.e; added separate `USDC.e` entry for the bridged variant.
 
 ### Docs
+- Added the SC6019 Option 6 proposal and explicit separation between the inherited capstone baseline and planned intent-routing work.
 - Added independent-repository import provenance and setup instructions; corrected the Java service's local CLI build path.
 - Documented Tempo chain aliases, provider support, native DEX caveats, and execution examples across README, AGENTS, and Mintlify docs.
 - Updated Tempo swap examples to use supported USD TIP-20 pairs and documented that the DEX auto-routes supported pairs through quote-token relationships.
